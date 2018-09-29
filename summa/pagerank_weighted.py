@@ -1,7 +1,7 @@
 from scipy.sparse import csr_matrix
 from scipy.linalg import eig
 from numpy import empty as empty_matrix
-import igraph
+import igraph as ig
 
 try:
     from numpy import VisibleDeprecationWarning
@@ -40,7 +40,7 @@ def pagerank_weighted(graph, initial_value=None, damping=0.85):
 
 
 def pagerank_weighted_scipy(graph, damping=0.85):
-    g = igraph.Graph()
+    g = ig.Graph()
     print(graph.nodes())
     node_to_int_mapping = dict([(n, i) for (i, n) in enumerate(graph.nodes())])
     edges_int = [(node_to_int_mapping[n1], node_to_int_mapping[n2]) for (n1, n2) in graph.edge_properties]
