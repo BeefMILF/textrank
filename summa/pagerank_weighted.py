@@ -1,6 +1,7 @@
 from scipy.sparse import csr_matrix
 from scipy.linalg import eig
 from numpy import empty as empty_matrix
+import igraph
 
 try:
     from numpy import VisibleDeprecationWarning
@@ -39,12 +40,17 @@ def pagerank_weighted(graph, initial_value=None, damping=0.85):
 
 
 def pagerank_weighted_scipy(graph, damping=0.85):
-    adjacency_matrix = build_adjacency_matrix(graph)
-    probability_matrix = build_probability_matrix(graph)
+    g = igraph.Graph()
+    print(graph.nodes())
+    node_to_int_mapping = dict([(n, i) for (i, n) in enumerate(graph.nodes())])
+    edges_int = [(node_to_int_mapping[n1], node_to_int_mapping[n2]) for (n1, n2) in graph.edge_properties]
+    edges_weitghts = [graph.edge_weight(edge) for edge in graph.edge_properties]
 
-    pagerank_matrix = damping * adjacency_matrix.todense() + (1 - damping) * probability_matrix
-    vals, vecs = eig(pagerank_matrix, left=True, right=False)
-    return process_results(graph, vecs)
+    g.add_vertices(node_to_int_mapping.values())
+    g.add_edges(edges_int)
+
+    ranking = g.pagerank(weights=edges_weitghts, damping=damping, niter=100)
+    return dict([(n, ranking[node_to_int_mapping[n]]) for n in graph.nodes()])
 
 
 def build_adjacency_matrix(graph):
